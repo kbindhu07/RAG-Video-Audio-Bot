@@ -1,6 +1,6 @@
 pytubefix
 llama-index-vector-stores-lancedb
-llama-index-multi-modal-llms-gemini
+llama-index-multi-modal-llms-openai
 llama-index-embeddings-clip
 llama_index
 ftfy
@@ -20,4 +20,5 @@ SpeechRecognition
 ffmpeg-python
 soundfile
 streamlit
+
 google-generativeai
