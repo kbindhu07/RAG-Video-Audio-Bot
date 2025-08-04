@@ -1,156 +1,181 @@
-# 🎬 MultiModal RAG with Videos
+# 🎬 Video Content RAG with Visual Understanding
 
-**Transform any YouTube video into an interactive AI assistant!** This advanced application lets you ask questions about video content and get intelligent answers by analyzing both what you see and what you hear.
+A multimodal RAG (Retrieval-Augmented Generation) system that processes video content, extracts key frames, transcribes audio, and allows users to query both visual and audio elements from video libraries.
 
-## 🚀 What This Bot Does
+## 🎯 Problem Statement
 
-Imagine having a smart assistant that can watch any YouTube video and answer your questions about it. This bot does exactly that by:
-
-- **📥 Downloads YouTube videos** automatically
-- **👁️ Analyzes visual content** by extracting key frames
-- **🎧 Listens to audio** and converts speech to text
-- **🧠 Combines visual + textual data** for comprehensive understanding
-- **💬 Answers your questions** about the video content intelligently
+Create a multimodal RAG system that processes video content, extracts key frames, transcribes audio, and allows users to query both visual and audio elements from video libraries.
 
 ## ✨ Key Features
 
-### 🎯 **MultiModal Intelligence**
-- **Visual Analysis**: Extracts and analyzes key frames from videos
-- **Audio Processing**: Transcribes speech to text for content understanding
-- **Combined Understanding**: Uses both visual and textual data for better answers
+- **Video Processing & Key Frame Extraction**: Automatically extracts key visual frames from videos at optimal intervals
+- **Audio Transcription & Synchronization**: Converts video audio to text with Whisper for comprehensive content understanding
+- **Visual Element Recognition**: Implements CLIP-based visual understanding for scene and object detection
+- **Multi-modal Search Capabilities**: Combines visual and audio elements for comprehensive video querying
+- **Temporal Indexing**: Maintains timestamp references for precise video content retrieval
+- **Vector Database Integration**: Uses LanceDB for efficient storage and retrieval of multimodal embeddings
 
-### 🔍 **Smart Question Answering**
-- Ask specific questions about video content
-- Get detailed responses based on what was shown AND said
-- Receive context-aware answers with visual frame references
+## 🏗️ Technical Architecture
 
-### 🎨 **Beautiful User Interface**
-- Clean, modern Streamlit interface
-- Step-by-step guided process
-- Real-time processing feedback
-- Visual frame display for transparency
+### Core Components
 
-### 🔄 **Flexible Processing**
-- Process any YouTube video URL
-- Reset and start over with new videos
-- Persistent session management
+1. **Video Preprocessing Pipeline**
+   - YouTube video download and processing
+   - Key frame extraction at 0.5 FPS for optimal analysis
+   - Audio extraction and conversion to WAV format
 
-## 🛠️ How It Works
+2. **Multi-modal Embedding System**
+   - CLIP embeddings for visual content understanding
+   - OpenAI Whisper for audio transcription
+   - OpenAI GPT-4 Turbo for multimodal reasoning
 
-### Step 1: Setup
-1. Enter your OpenAI API key
-2. The app securely stores it for your session
+3. **Vector Database & Retrieval**
+   - LanceDB for efficient storage of text and image embeddings
+   - Multi-modal similarity search with configurable top-k retrieval
+   - Separate collections for text and visual content
 
-### Step 2: Video Processing
-1. Paste any YouTube video URL
-2. Click "Process Video" to start analysis
-3. The bot downloads and processes the video:
-   - Extracts key visual frames
-   - Converts audio to text
-   - Creates a multimodal knowledge base
+4. **Query Processing & Generation**
+   - Context-aware prompt engineering
+   - Multi-modal LLM integration for comprehensive responses
+   - Temporal context preservation
 
-### Step 3: Ask Questions
-1. Ask any question about the video content
-2. Get intelligent answers based on:
-   - Visual frames from the video
-   - Transcribed audio content
-   - Combined context analysis
-
-### Step 4: Explore Results
-- View the video metadata
-- See extracted text context
-- Examine visual frames used in analysis
-- Read AI-generated answers
-
-## 🏗️ Technology Stack
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **AI Model** | OpenAI GPT-4-turbo | Generates intelligent responses |
-| **Framework** | LlamaIndex | MultiModal RAG system |
-| **Vector Database** | LanceDB | Stores visual + textual embeddings |
-| **Video Processing** | MoviePy | Frame extraction & audio processing |
-| **Speech Recognition** | SpeechRecognition | Audio-to-text conversion |
-| **Interface** | Streamlit | User-friendly web interface |
-| **Video Download** | PytubeFix | YouTube video downloading |
-
-## 📦 Installation & Setup
+## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.8 or higher
+
+- Python 3.8+
 - OpenAI API key
-- Internet connection for video downloads
+- FFmpeg (for video processing)
 
-### Quick Start
+### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/multimodal-rag-with-videos.git
-   cd multimodal-rag-with-videos
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/video-content-rag.git
+cd video-content-rag
+```
 
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-3. **Run the application**
-   ```bash
-   streamlit run app.py
-   ```
+3. Set up your OpenAI API key:
+```bash
+export OPENAI_API_KEY="your-api-key-here"
+```
 
-4. **Start using it!**
-   - Open your browser to the provided URL
+### Usage
+
+1. **Run the Streamlit Application**:
+```bash
+streamlit run app.py
+```
+
+2. **Access the Web Interface**:
+   - Open your browser and navigate to `http://localhost:8501`
    - Enter your OpenAI API key
-   - Paste a YouTube video URL
-   - Ask questions!
+   - Provide a YouTube video URL
+   - Process the video to extract audio and visual frames
+   - Ask questions about the video content
 
-## 💡 Perfect Use Cases
+## 📊 Technical Implementation
 
-### 🎓 **Educational Content**
-- **Lectures**: Ask questions about specific topics covered
-- **Tutorials**: Get step-by-step explanations
-- **Documentaries**: Extract key information and insights
+### Video Processing Pipeline
 
-### 📚 **Research & Analysis**
-- **Academic Videos**: Analyze research presentations
-- **Conference Talks**: Extract key points and findings
-- **Training Materials**: Get detailed explanations
+```python
+# Key frame extraction at 0.5 FPS
+def video_to_images(video_path, output_folder):
+    clip = VideoFileClip(video_path)
+    clip.write_images_sequence(os.path.join(output_folder, "frame%04d.png"), fps=0.5)
+```
 
-### 🎬 **Content Review**
-- **Product Reviews**: Ask about specific features mentioned
-- **Movie Analysis**: Get insights about scenes and dialogue
-- **News Reports**: Extract key facts and details
+### Multi-modal Indexing
 
-## 🔧 Advanced Features
+```python
+# Separate vector stores for text and images
+text_store = LanceDBVectorStore(uri="lancedb", table_name="text_collection")
+image_store = LanceDBVectorStore(uri="lancedb", table_name="image_collection")
 
-### **MultiModal Retrieval**
-- Combines visual and textual similarity search
-- Returns most relevant frames and text snippets
-- Provides context for AI responses
+# Multi-modal index creation
+index = MultiModalVectorStoreIndex.from_documents(
+    documents, storage_context=storage_context
+)
+```
 
-### **Smart Context Management**
-- Automatic metadata extraction
-- Session state management
-- Efficient data processing pipeline
+### Retrieval System
 
-### **User Experience**
-- Real-time processing feedback
-- Error handling and recovery
-- Clean, responsive interface
+```python
+# Multi-modal retrieval with configurable top-k
+retriever_engine = index.as_retriever(
+    similarity_top_k=3, image_similarity_top_k=3
+)
+```
 
-## 🤝 Contributing
+## 🎯 Key Requirements Met
 
-We welcome contributions! Here's how you can help:
+- ✅ **Video processing and key frame extraction**: Implemented with MoviePy
+- ✅ **Audio transcription and synchronization**: Whisper-based transcription
+- ✅ **Visual element recognition and tagging**: CLIP embeddings for visual understanding
+- ✅ **Multi-modal search capabilities**: Combined visual + audio retrieval
+- ✅ **Temporal indexing with timestamp referencing**: Frame-based temporal context
 
-- 🐛 **Report bugs** by opening an issue
-- 💡 **Suggest features** for new capabilities
-- 🔧 **Submit pull requests** for improvements
-- 📚 **Improve documentation** for better clarity
+## 🔧 Technical Challenges Addressed
 
-## 📄 License
+- **Video preprocessing and frame selection algorithms**: Optimized frame extraction at 0.5 FPS
+- **Visual-audio synchronization and alignment**: Coordinated processing pipeline
+- **Object detection and scene understanding**: CLIP-based visual analysis
+- **Multi-modal embedding space creation**: Unified embedding strategy
+- **Large-scale video data storage and indexing**: LanceDB vector database
 
-This project is open source and available under the MIT License.
+## 📈 Evaluation Metrics
+
+The system provides:
+- **Retrieval Accuracy**: Multi-modal similarity search with relevant context
+- **Latency**: Optimized processing pipeline for real-time querying
+- **Relevance Scoring**: Configurable top-k retrieval for quality results
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Streamlit for interactive web interface
+- **Video Processing**: MoviePy, PyTubeFix
+- **Audio Processing**: SpeechRecognition, Whisper
+- **Computer Vision**: CLIP, PIL, scikit-image
+- **Vector Database**: LanceDB
+- **LLM Integration**: OpenAI GPT-4 Turbo
+- **Embeddings**: CLIP for visual, OpenAI for text
+
+## 📁 Project Structure
+
+```
+video-content-rag/
+├── app.py                 # Main Streamlit application
+├── requirements.txt       # Python dependencies
+├── README.md             # Project documentation
+├── mixed_data/           # Processed video data
+│   ├── output_text.txt   # Transcribed audio
+│   └── frame*.png        # Extracted key frames
+└── video_data/           # Downloaded video files
+    └── input_vid.mp4     # Processed video
+```
+
+## 🚀 Deployment
+
+### Streamlit Cloud Deployment
+
+1. Push your code to GitHub
+2. Connect your repository to Streamlit Cloud
+3. Deploy with the following configuration:
+   - Python version: 3.9+
+   - Dependencies: `requirements.txt`
+
+### Environment Variables
+
+Set the following environment variables in your deployment:
+- `OPENAI_API_KEY`: Your OpenAI API key
+
+
+
 
 ## 🙏 Acknowledgments
 
