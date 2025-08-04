@@ -16,7 +16,9 @@ import json
 
 # Streamlit app setup with a custom layout and title
 st.set_page_config(
-    page_title="YouTube Video Q&A with LLM", layout="centered", page_icon="🎬"
+    page_title="Video Content RAG with Visual Understanding",
+    layout="wide",
+    page_icon="🎬",
 )
 
 # Custom CSS styling to enhance UI readability
@@ -115,35 +117,116 @@ st.markdown(
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
+    
+    /* Add info boxes styling */
+    .info-box {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+    }
+    
+    .success-box {
+        background-color: #e8f5e8;
+        border-left: 4px solid #4caf50;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+    }
+    
+    .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: 4px;
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-st.title("🎬 YouTube Video Q&A with LLM")
+# Main title and description
+st.title("🎬 Video Content RAG with Visual Understanding")
 st.markdown("---")
-st.subheader(
-    "🚀 Process and ask questions about YouTube videos effortlessly! Helpful for studying!"
-)
 
+# Project description
 st.markdown(
     """
-    **How it works:**
-    1. Enter your OpenAI API key
-    2. Provide a YouTube video URL
-    3. Process the video to extract audio and frames
-    4. Ask questions about the video content
-    
-    The app will analyze both the audio transcript and visual frames to provide comprehensive answers!
-    """
+<div class="info-box">
+    <h3>🔬 Research Project: Multimodal Video Content Analysis</h3>
+    <p>This system implements a comprehensive multimodal RAG (Retrieval-Augmented Generation) pipeline for video content analysis, 
+    combining visual understanding, audio transcription, and intelligent querying capabilities.</p>
+</div>
+""",
+    unsafe_allow_html=True,
 )
+
+# Key Features Section
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown(
+        """
+    <div style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+        <h4>🎬 Video Processing</h4>
+        <p>Key frame extraction at 0.5 FPS for optimal visual analysis</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+with col2:
+    st.markdown(
+        """
+    <div style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+        <h4>🎧 Audio Transcription</h4>
+        <p>Whisper-based speech-to-text with temporal synchronization</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+with col3:
+    st.markdown(
+        """
+    <div style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+        <h4>🔍 Multi-modal RAG</h4>
+        <p>CLIP embeddings + Vector search for comprehensive understanding</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
 st.markdown("---")
+
+# Technical Architecture Section
+st.subheader("🏗️ Technical Architecture")
+st.markdown(
+    """
+This system addresses the following technical challenges:
+
+- **Video preprocessing and frame selection algorithms**: Optimized frame extraction at 0.5 FPS
+- **Visual-audio synchronization and alignment**: Coordinated processing pipeline  
+- **Object detection and scene understanding**: CLIP-based visual analysis
+- **Multi-modal embedding space creation**: Unified embedding strategy
+- **Large-scale video data storage and indexing**: LanceDB vector database
+"""
+)
 
 # OpenAI API key input
-st.markdown("### 🔑 Step 1: Enter your OpenAI API Key")
+st.markdown("### 🔑 Step 1: API Configuration")
 st.markdown(
-    "You'll need an OpenAI API key to use this application. Get one from [OpenAI's platform](https://platform.openai.com/api-keys)."
+    """
+<div class="warning-box">
+    <strong>Required:</strong> You'll need an OpenAI API key to use this application. 
+    Get one from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI's platform</a>.
+</div>
+""",
+    unsafe_allow_html=True,
 )
+
 api_key = st.text_input(
     "OpenAI API Key:",
     type="password",
@@ -240,22 +323,37 @@ if "retriever_engine" not in st.session_state:
     st.session_state.metadata_vid = None
 
 # Step 2: Input YouTube URL
-st.markdown("### 🎥 Step 2: Enter the YouTube Video URL")
+st.markdown("### 🎥 Step 2: Video Input & Processing")
 st.markdown(
-    "Provide a valid YouTube video URL. The app will download and process the video to extract audio and visual frames."
+    """
+<div class="info-box">
+    <strong>Processing Pipeline:</strong>
+    <ol>
+        <li>Download video from YouTube URL</li>
+        <li>Extract key frames at 0.5 FPS for visual analysis</li>
+        <li>Convert audio to text using Whisper</li>
+        <li>Create multimodal embeddings with CLIP</li>
+        <li>Index content in LanceDB vector database</li>
+    </ol>
+</div>
+""",
+    unsafe_allow_html=True,
 )
+
 video_url = st.text_input(
     "Enter the YouTube video link:",
     key="video_input",
     placeholder="https://www.youtube.com/watch?v=example",
-    help="Paste a complete YouTube URL here. The video will be downloaded and processed.",
+    help="Paste a complete YouTube URL here. The video will be downloaded and processed through our multimodal pipeline.",
 )
 
 # Process the video on button click
 if video_url and st.session_state.retriever_engine is None:
-    if st.button("🚀 Process Video"):
+    if st.button("🚀 Process Video", help="Start the multimodal processing pipeline"):
         try:
-            with st.spinner("Processing video... This might take a while :( "):
+            with st.spinner(
+                "Processing video through multimodal pipeline... This may take several minutes."
+            ):
                 st.session_state.metadata_vid = download_video(
                     video_url, output_video_path
                 )
@@ -292,24 +390,44 @@ if video_url and st.session_state.retriever_engine is None:
                     similarity_top_k=3, image_similarity_top_k=3
                 )
 
-                st.success("✅ Video processing completed! You can now ask questions.")
+                st.success(
+                    "✅ Multimodal processing completed! You can now query the video content."
+                )
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
 # Step 3: Ask questions
 if st.session_state.retriever_engine:
-    st.markdown("### 💬 Step 3: Ask a Question About the Video")
+    st.markdown("### 🔍 Step 3: Multimodal Query Interface")
     st.markdown(
-        "Now you can ask questions about the video content. The app will analyze both the audio transcript and visual frames to provide answers."
+        """
+    <div class="info-box">
+        <strong>Query Capabilities:</strong>
+        <ul>
+            <li>Ask about visual content and scenes</li>
+            <li>Query audio transcript and spoken content</li>
+            <li>Get comprehensive answers combining both modalities</li>
+            <li>Receive context-aware responses with frame references</li>
+        </ul>
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
+
     user_query = st.text_input(
-        "Ask a question about the video:",
+        "Ask a question about the video content:",
         key="question_input",
         placeholder="What is the main topic discussed in this video?",
         help="Ask any question about the video content, topics, or details shown in the video.",
     )
 
-    if st.button("🔍 Submit Query") and user_query:
+    if (
+        st.button(
+            "🔍 Submit Query",
+            help="Process your question through the multimodal RAG system",
+        )
+        and user_query
+    ):
         try:
             img, txt = retrieve(
                 retriever_engine=st.session_state.retriever_engine, query_str=user_query
@@ -362,7 +480,7 @@ if st.session_state.retriever_engine:
             )
 
             # Display the response
-            st.markdown("### 🤖 LLM Response:")
+            st.markdown("### 🤖 Multimodal RAG Response:")
             st.markdown(
                 f"""
             <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50;">
@@ -374,14 +492,44 @@ if st.session_state.retriever_engine:
             )
 
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            st.error(f"An error occurred during query processing: {e}")
+
+# Evaluation Metrics Section
+st.markdown("---")
+st.markdown("### 📊 Evaluation Metrics")
+st.markdown(
+    """
+<div class="info-box">
+    <strong>System Performance Indicators:</strong>
+    <ul>
+        <li><strong>Retrieval Accuracy:</strong> Multi-modal similarity search with relevant context</li>
+        <li><strong>Processing Latency:</strong> Optimized pipeline for real-time querying</li>
+        <li><strong>Relevance Scoring:</strong> Configurable top-k retrieval for quality results</li>
+        <li><strong>Visual-Audio Alignment:</strong> Coordinated processing of both modalities</li>
+    </ul>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
 # Step 4: Process new video
 st.markdown("---")
-st.markdown("### 🔄 Start Over")
+st.markdown("### 🔄 Reset & Process New Video")
 st.markdown("Click the button below to reset the application and process a new video.")
 if st.button("🔄 Process New Video"):
     # Reset session state
     for key in st.session_state.keys():
         del st.session_state[key]
     st.success("✅ Application reset successfully! Please enter a new video link.")
+
+# Footer
+st.markdown("---")
+st.markdown(
+    """
+<div style="text-align: center; color: #666; font-size: 14px;">
+    <p><strong>Video Content RAG with Visual Understanding</strong> | Research Project</p>
+    <p>Multimodal RAG system for comprehensive video content analysis</p>
+</div>
+""",
+    unsafe_allow_html=True,
+)
