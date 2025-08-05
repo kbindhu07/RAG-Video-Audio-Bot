@@ -20,5 +20,6 @@ SpeechRecognition
 ffmpeg-python
 soundfile
 streamlit
-
+yt_dlp
 google-generativeai
+
