@@ -328,14 +328,14 @@ if "retriever_engine" not in st.session_state:
     st.session_state.retriever_engine = None
     st.session_state.metadata_vid = None
 
-# Step 2: Input YouTube URL
-st.markdown("### 🎥 Step 2: Video Input & Processing")
+# Step 2: Video Upload & Processing
+st.markdown("### 🎥 Step 2: Video Upload & Processing")
 st.markdown(
     """
 <div class="info-box">
     <strong>Processing Pipeline:</strong>
     <ol>
-        <li>Download video from YouTube URL</li>
+        <li>Upload a video file (MP4, MOV, AVI, etc.)</li>
         <li>Extract key frames at 0.5 FPS for visual analysis</li>
         <li>Convert audio to text using Whisper</li>
         <li>Create multimodal embeddings with CLIP</li>
@@ -346,26 +346,31 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-video_url = st.text_input(
-    "Enter the YouTube video link:",
-    key="video_input",
-    placeholder="https://www.youtube.com/watch?v=example",
-    help="Paste a complete YouTube URL here. The video will be downloaded and processed through our multimodal pipeline.",
+uploaded_file = st.file_uploader(
+    "Upload a video file:",
+    type=["mp4", "mov", "avi", "mkv"],
+    help="Upload a video file from your computer. The video will be processed through the multimodal pipeline.",
 )
 
-# Process the video on button click
-if video_url and st.session_state.retriever_engine is None:
+if uploaded_file and st.session_state.retriever_engine is None:
     if st.button("🚀 Process Video", help="Start the multimodal processing pipeline"):
         try:
             with st.spinner(
                 "Processing video through multimodal pipeline... This may take several minutes."
             ):
-                st.session_state.metadata_vid = download_video(
-                    video_url, output_video_path
-                )
+                # Save uploaded file
+                Path(output_video_path).mkdir(parents=True, exist_ok=True)
+                with open(filepath, "wb") as f:
+                    f.write(uploaded_file.read())
+                st.session_state.metadata_vid = {
+                    "Title": uploaded_file.name,
+                    "Author": "Uploaded by user",
+                    "Views": "N/A",
+                }
                 video_to_images(filepath, output_folder)
                 video_to_audio(filepath, output_audio_path)
                 text_data = audio_to_text(output_audio_path)
+                st.session_state["extracted_text"] = text_data
 
                 # Save extracted text to a file
                 with open(output_folder + "output_text.txt", "w") as file:
@@ -441,7 +446,7 @@ if st.session_state.retriever_engine:
             image_documents = SimpleDirectoryReader(
                 input_dir=output_folder, input_files=img
             ).load_data()
-            context_str = "".join(txt)
+            context_str = st.session_state.get("extracted_text", "")
 
             # Display metadata and context
             st.markdown("### 📄 Video Metadata:")
@@ -526,7 +531,7 @@ if st.button("🔄 Process New Video"):
     # Reset session state
     for key in st.session_state.keys():
         del st.session_state[key]
-    st.success("✅ Application reset successfully! Please enter a new video link.")
+    st.success("✅ Application reset successfully! Please upload new video.")
 
 # Footer
 st.markdown("---")
