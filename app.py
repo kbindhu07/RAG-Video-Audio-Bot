@@ -13,6 +13,7 @@ from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 from llama_index.core.schema import ImageNode
 import openai
 import json
+from yt_dlp import YoutubeDL
 
 # Streamlit app setup with a custom layout and title
 st.set_page_config(
@@ -247,12 +248,17 @@ Path(output_folder).mkdir(
 
 # Function to download video from YouTube
 def download_video(url, output_path):
-    yt = YouTube(url)
-    metadata = {"Author": yt.author, "Title": yt.title, "Views": yt.views}
-    yt.streams.get_highest_resolution().download(
-        output_path=output_path, filename="input_vid.mp4"
-    )
-    return metadata
+    ydl_opts = {
+        "outtmpl": os.path.join(output_path, "input_vid.%(ext)s"),
+        "format": "best",
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(url, download=True)
+        return {
+            "Title": info_dict.get("title"),
+            "Author": info_dict.get("uploader"),
+            "Views": info_dict.get("view_count"),
+        }
 
 
 # Function to extract frames from a video and save as images
